@@ -2,7 +2,7 @@
  SuperCon 2015 予選問題
  チーム名:1point
  
- 最終更新:06/03 00:40
+ 最終更新:06/03 01:18
  */
 
 
@@ -14,23 +14,24 @@
 /*プロトタイプ宣言*/
 int comp_rep(const void * A, const void * B);
 int comp_robot(const void * A, const void * B);
-int lower_bound_robot(int Q,int min_Z,int t);
-int upper_bound_robot(int Q,int min_Z,int t);
-int get_length_r(int num);
-int get_length_l(int num);
-int max(int a,int b);
-int min(int a,int b);
+int lower_bound_robot(int Q,long long min_Z,int t);
+int upper_bound_robot(int Q,long long min_Z,int t);
+long long get_length_r(int num);
+long long get_length_l(int num);
+long long max(long long a,long long b);
+long long min(long long a,long long b);
 
 
 /*定数*/
-const int SIZE = 300; // 300000
-const int INF = 1050000000;
+const int SIZE = 300000; // 300000
+const int INF = 1000000000;
+const long long LLINF = 100000000000;
 
 
 /*構造体*/
 typedef struct {
     
-    int z;
+    long long z;
     int q;
     int num;
     
@@ -38,7 +39,7 @@ typedef struct {
 
 typedef struct {
     
-    int x;
+    long long x;
     int p;
     int num;
     int to_l;
@@ -63,12 +64,12 @@ clock_t start, end;
 /*メイン関数*/
 int main(void)
 {
-    int l,r,a,b,min_lr,max_lr,border[6],border_n[6],border_add[6],border_add_zn[6],edge;
+    long long l,r,a,b,min_lr,max_lr,border[6],border_n[6],border_add[6],border_add_zn[6],edge;
     
     /*入力*/
     scanf("%d %d", &L, &n);
     for (int i = 0; i < n; i++) {
-        scanf("%d %d", &rep[i].x, &rep[i].p);
+        scanf("%lld %d", &rep[i].x, &rep[i].p);
         
         rep[i].num = i;
         rep[i].to_l = i-1;
@@ -79,7 +80,7 @@ int main(void)
     
     scanf("%d", &m);
     for (int i = 0; i < m; i++) {
-        scanf("%d %d", &robot[i].z, &robot[i].q);
+        scanf("%lld %d", &robot[i].z, &robot[i].q);
         
         robot[i].num = i;
     }
@@ -201,7 +202,7 @@ int main(void)
     
     /*答え計算*/
     for(int i=0;i<=m;i++){
-        ans[robot[i].num] = sum[i]+sum_zn[i]*robot[i].z;
+        ans[robot[i].num] = sum[i]+sum_zn[i]*(int)robot[i].z;
     }
     
     /*出力*/
@@ -254,7 +255,7 @@ int comp_robot(const void * A, const void * B){
 }
 
 /*二分探索*/
-int lower_bound_robot(int Q,int min_Z,int t){
+int lower_bound_robot(int Q,long long min_Z,int t){
     
     //[l,r]
     
@@ -273,7 +274,7 @@ int lower_bound_robot(int Q,int min_Z,int t){
     return l;
 }
 
-int upper_bound_robot(int Q,int min_Z,int t){
+int upper_bound_robot(int Q,long long min_Z,int t){
     
     //[l,r]
     
@@ -293,34 +294,34 @@ int upper_bound_robot(int Q,int min_Z,int t){
 }
 
 /*範囲長計算*/
-int get_length_r(int num){
+long long get_length_r(int num){
     
     if(rep_in[num].to_r <n){
         return rep_in[rep_in[num].to_r].x - rep_in[num].x;
     }else{
-        return INF; //L-rep_in[num].x;
+        return LLINF; //L-rep_in[num].x;
     }
 }
 
-int get_length_l(int num){
+long long get_length_l(int num){
     
     if(0<=rep_in[num].to_l){
         return rep_in[num].x - rep_in[rep_in[num].to_l].x;
     }else{
-        return INF; //rep_in[num].x;
+        return LLINF; //rep_in[num].x;
     }
 }
 
 /*max,min*/
 
-int max(int a,int b){
+long long max(long long a,long long b){
     if(a>b)
         return a;
     else
         return b;
 }
 
-int min(int a,int b){
+long long min(long long a,long long b){
     if(a<b)
         return a;
     else
