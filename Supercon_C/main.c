@@ -1,8 +1,9 @@
 /*
  SuperCon 2015 予選問題
- チーム名:1point
+ チーム名:onepoint
+ O(nlogn + mlogm + nlogm)
  
- 最終更新:06/03 01:18
+ 最終更新:06/03 23:05
  */
 
 
@@ -14,8 +15,8 @@
 /*プロトタイプ宣言*/
 int comp_rep(const void * A, const void * B);
 int comp_robot(const void * A, const void * B);
-int lower_bound_robot(int Q,long long min_Z,int t);
-int upper_bound_robot(int Q,long long min_Z,int t);
+long long lower_bound_robot(int Q,long long min_Z,int t);
+long long upper_bound_robot(int Q,long long min_Z,int t);
 long long get_length_r(int num);
 long long get_length_l(int num);
 long long max(long long a,long long b);
@@ -25,7 +26,7 @@ long long min(long long a,long long b);
 /*定数*/
 const int SIZE = 300000; // 300000
 const int INF = 1000000000;
-const long long LLINF = 100000000000;
+const long long LLINF = 100000000000LL;
 
 
 /*構造体*/
@@ -51,10 +52,10 @@ typedef struct {
 /*変数宣言*/
 int L, n, m;
 
-ROBOT robot[SIZE+2];
-REP rep[SIZE],rep_in[SIZE];
+ROBOT robot[SIZE+10];
+REP rep[SIZE+10],rep_in[SIZE+10];
 
-int ans[SIZE+1],sum[SIZE+2],sum_zn[SIZE+2];
+long long ans[SIZE+10],sum[SIZE+10],sum_zn[SIZE+10];
 
 
 /* 時間計測用（デバッグ等に使って下さい） */
@@ -86,7 +87,7 @@ int main(void)
     }
     
     robot[m].q=INF;
-    robot[m].z=INF;
+    robot[m].z=LLINF;
     robot[m+1].q=0;
     robot[m+1].z=0;
     
@@ -96,6 +97,7 @@ int main(void)
     /*ソート*/
     qsort((void*)rep,n,sizeof(rep[0]),comp_rep);
     qsort((void*)robot,m+2,sizeof(robot[0]),comp_robot);
+    
     
     /*計算*/
     // ans = sum_zn * z + sum;
@@ -115,7 +117,7 @@ int main(void)
         border[2] = min(2*min_lr,max_lr);
         border[3] = max(2*min_lr,max_lr);
         border[4] = l+r;
-        border[5] = INF*2;
+        border[5] = LLINF*2;
         
         border_add[0] = 0;
         border_add_zn[0] = 2;
@@ -189,8 +191,10 @@ int main(void)
             
         }
         
-        rep_in[rep_in[rep[i].num].to_r].to_l = rep_in[rep[i].num].to_l;
-        rep_in[rep_in[rep[i].num].to_l].to_r = rep_in[rep[i].num].to_r;
+        if(n>rep_in[rep[i].num].to_r)
+            rep_in[rep_in[rep[i].num].to_r].to_l = rep_in[rep[i].num].to_l;
+        if(0<=rep_in[rep[i].num].to_l)
+            rep_in[rep_in[rep[i].num].to_l].to_r = rep_in[rep[i].num].to_r;
     }
     
     
@@ -202,7 +206,7 @@ int main(void)
     
     /*答え計算*/
     for(int i=0;i<=m;i++){
-        ans[robot[i].num] = sum[i]+sum_zn[i]*(int)robot[i].z;
+        ans[robot[i].num] = sum[i]+sum_zn[i]*robot[i].z;
     }
     
     /*出力*/
@@ -210,7 +214,7 @@ int main(void)
     fprintf(stderr, "%f[s]\n", (double)(end - start) / CLOCKS_PER_SEC);
     
     for(int i=0;i<m;i++){
-        printf("%d\n",ans[i]);
+        printf("%lld\n",ans[i]);
     }
     
     return 0;
@@ -255,7 +259,7 @@ int comp_robot(const void * A, const void * B){
 }
 
 /*二分探索*/
-int lower_bound_robot(int Q,long long min_Z,int t){
+long long lower_bound_robot(int Q,long long min_Z,int t){
     
     //[l,r]
     
@@ -271,10 +275,10 @@ int lower_bound_robot(int Q,long long min_Z,int t){
         }
     }
     
-    return l;
+    return (long long)l;
 }
 
-int upper_bound_robot(int Q,long long min_Z,int t){
+long long upper_bound_robot(int Q,long long min_Z,int t){
     
     //[l,r]
     
@@ -290,7 +294,7 @@ int upper_bound_robot(int Q,long long min_Z,int t){
         }
     }
     
-    return l;
+    return (long long)l;
 }
 
 /*範囲長計算*/
