@@ -3,7 +3,7 @@
  チーム名:onepoint
  O(nlogn + mlogm + nlogm)
  
- 最終更新:06/03 23:05
+ 最終更新:06/07 23:37
  */
 
 
@@ -16,12 +16,10 @@
 int comp_rep(const void * A, const void * B);
 int comp_robot(const void * A, const void * B);
 long long lower_bound_robot(int Q,long long min_Z,int t);
-long long upper_bound_robot(int Q,long long min_Z,int t);
 long long get_length_r(int num);
 long long get_length_l(int num);
 long long max(long long a,long long b);
 long long min(long long a,long long b);
-
 
 /*定数*/
 const int SIZE = 300000; // 300000
@@ -58,10 +56,6 @@ REP rep[SIZE+10],rep_in[SIZE+10];
 long long ans[SIZE+10],sum[SIZE+10],sum_zn[SIZE+10];
 
 
-/* 時間計測用（デバッグ等に使って下さい） */
-clock_t start, end;
-
-
 /*メイン関数*/
 int main(void)
 {
@@ -91,13 +85,9 @@ int main(void)
     robot[m+1].q=0;
     robot[m+1].z=0;
     
-    start = clock(); //計測
-    
-    
     /*ソート*/
     qsort((void*)rep,n,sizeof(rep[0]),comp_rep);
     qsort((void*)robot,m+2,sizeof(robot[0]),comp_robot);
-    
     
     /*計算*/
     // ans = sum_zn * z + sum;
@@ -112,6 +102,7 @@ int main(void)
         a = rep[i].x-l;
         b = rep[i].x+r;
         
+        /*範囲加算*/
         border[0] = 0;
         border[1] = min_lr;
         border[2] = min(2*min_lr,max_lr);
@@ -191,6 +182,7 @@ int main(void)
             
         }
         
+        /*隣のリンク*/
         if(n>rep_in[rep[i].num].to_r)
             rep_in[rep_in[rep[i].num].to_r].to_l = rep_in[rep[i].num].to_l;
         if(0<=rep_in[rep[i].num].to_l)
@@ -209,18 +201,12 @@ int main(void)
         ans[robot[i].num] = sum[i]+sum_zn[i]*robot[i].z;
     }
     
-    /*出力*/
-    end = clock();
-    fprintf(stderr, "%f[s]\n", (double)(end - start) / CLOCKS_PER_SEC);
-    
     for(int i=0;i<m;i++){
         printf("%lld\n",ans[i]);
     }
     
     return 0;
 }
-
-
 
 
 /*qsort 比較関数*/
@@ -262,7 +248,6 @@ int comp_robot(const void * A, const void * B){
 long long lower_bound_robot(int Q,long long min_Z,int t){
     
     //[l,r]
-    
     int l=0,r=m+1,mid;
     
     while(l<r){
@@ -272,25 +257,6 @@ long long lower_bound_robot(int Q,long long min_Z,int t){
             l = mid+1;
         }else{
             r = mid;
-        }
-    }
-    
-    return (long long)l;
-}
-
-long long upper_bound_robot(int Q,long long min_Z,int t){
-    
-    //[l,r]
-    
-    int l=0,r=m+1,mid;
-    
-    while(l<r){
-        mid = (l+r+1)/2;
-        
-        if(robot[mid].q > Q  || (robot[mid].q == Q && robot[mid].z*t > min_Z) ){
-            r = mid-1;
-        }else{
-            l = mid;
         }
     }
     
